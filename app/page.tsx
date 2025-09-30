@@ -75,13 +75,15 @@ export default function LandingPage() {
                 rotateY: 0,
                 perspective: 200,
               }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                rotateY: 30,
-                perspective: 200,
-                skew: -5,
-              }}
+              animate={
+                {
+                  opacity: 1,
+                  scale: 1,
+                  rotateY: 30,
+                  perspective: 200,
+                  skew: -5,
+                } as any
+              }
               transition={{ duration: 0.5, delay: 0.3 }}
             >
               <div className="relative">

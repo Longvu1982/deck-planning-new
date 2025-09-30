@@ -1,71 +1,57 @@
-"use client"
+"use client";
 
-import { motion, AnimatePresence } from "framer-motion"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Crown, MessageSquare } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { ChatPanel } from "@/components/chat-panel"
+import { ChatPanel } from "@/components/chat-panel";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import { UserSelection } from "@/liveblocks.config";
+import { AnimatePresence, motion } from "framer-motion";
+import { Crown } from "lucide-react";
 
-interface User {
-  id: string
-  name: string
-  vote: string | null
-  isHost: boolean
-  color: string
-  isSpectator?: boolean
-}
+const colorPack = [
+  "bg-gradient-to-br from-purple-400 to-purple-600",
+  "bg-gradient-to-br from-cyan-400 to-cyan-600",
+  "bg-gradient-to-br from-emerald-400 to-emerald-600",
+  "bg-gradient-to-br from-amber-400 to-amber-600",
+  "bg-gradient-to-br from-rose-400 to-rose-600",
+  "bg-gradient-to-br from-sky-400 to-sky-600",
+  "bg-gradient-to-br from-indigo-400 to-indigo-600",
+  "bg-gradient-to-br from-green-400 to-green-600",
+  "bg-gradient-to-br from-slate-400 to-slate-600",
+];
 
 interface VirtualTableProps {
-  users: User[]
-  revealed: boolean
-  shape: "round" | "square"
-  average: string | null
-  showChat?: boolean
+  users: UserSelection[];
+  revealed: boolean;
+  average: string | null;
+  showChat?: boolean;
 }
 
 // Update the VirtualTable component to be more responsive
-export function VirtualTable({ users, revealed, shape, average, showChat = false }: VirtualTableProps) {
+export function VirtualTable({
+  users,
+  revealed,
+  average,
+  showChat = false,
+}: VirtualTableProps) {
   // Calculate positions around the table
   const getPosition = (index: number, total: number) => {
-    if (shape === "round") {
-      // For round table, position in a circle
-      const angle = (index / total) * 2 * Math.PI - Math.PI / 2 // Start from top
-      const x = Math.cos(angle) * 100
-      const y = Math.sin(angle) * 100
-      return { x, y }
-    } else {
-      // For square table, position on the sides
-      const sideLength = Math.ceil(total / 4) // How many users per side
-      const side = Math.floor(index / sideLength) // Which side (0-3)
-      const posInSide = index % sideLength // Position within the side
-      const offset = 100 / sideLength // Spacing between users
+    const angle = (index / total) * 2 * Math.PI - Math.PI / 2; // Start from top
+    const x = Math.cos(angle) * 100;
+    const y = Math.sin(angle) * 100;
+    return { x, y };
+  };
 
-      // Calculate position based on which side of the square
-      switch (side) {
-        case 0: // Top side
-          return { x: -100 + (posInSide + 0.5) * offset * 2, y: -100 }
-        case 1: // Right side
-          return { x: 100, y: -100 + (posInSide + 0.5) * offset * 2 }
-        case 2: // Bottom side
-          return { x: 100 - (posInSide + 0.5) * offset * 2, y: 100 }
-        case 3: // Left side
-          return { x: -100, y: 100 - (posInSide + 0.5) * offset * 2 }
-        default:
-          return { x: 0, y: 0 }
-      }
-    }
-  }
+  console.log(revealed);
 
   return (
-    <div className="w-full relative mb-8">
+    <div className="w-full relative mb-20">
       {/* Make the container responsive but maintain aspect ratio */}
-      <div className="aspect-square max-w-[600px] mx-auto">
+      <div className="aspect-square max-w-[500px] mx-auto">
         {/* Table */}
         <div className="absolute inset-[15%] flex items-center justify-center">
           <div
             className={cn(
-              "w-full h-full backdrop-blur-md bg-white/40 border border-white/50 shadow-lg",
-              shape === "round" ? "rounded-full" : "rounded-xl",
+              "w-full h-full backdrop-blur-md bg-white/40 border border-white/50 shadow-lg rounded-full"
             )}
           >
             {/* Average score in the middle */}
@@ -85,11 +71,13 @@ export function VirtualTable({ users, revealed, shape, average, showChat = false
 
         {/* Users around the table */}
         {users.map((user, index) => {
-          const position = getPosition(index, users.length)
+          const position = getPosition(index, users.length);
+
+          console.log(user);
 
           return (
             <div
-              key={user.id}
+              key={user.name}
               className="absolute"
               style={{
                 left: `calc(50% + ${position.x * 0.42}%)`,
@@ -102,22 +90,22 @@ export function VirtualTable({ users, revealed, shape, average, showChat = false
                 <div className="relative">
                   <Avatar
                     className={cn(
-                      "h-10 w-10 sm:h-16 sm:w-16 border-2 border-white/50 shadow-lg",
-                      user.isSpectator && "opacity-70",
+                      "h-10 w-10 sm:h-16 sm:w-16 border-2 border-white/50 shadow-lg"
                     )}
                   >
-                    <AvatarFallback className={cn("text-white", user.color)}>{user.name.charAt(0)}</AvatarFallback>
+                    <AvatarFallback
+                      className={cn(
+                        "text-white",
+                        colorPack[index % colorPack.length]
+                      )}
+                    >
+                      {user.name.charAt(0)}
+                    </AvatarFallback>
                   </Avatar>
-                  {user.isHost && (
+                  {user.host && (
                     <span className="absolute -top-1 -right-1 bg-amber-400 rounded-full p-0.5 sm:p-1 shadow-md">
                       <Crown size={10} className="sm:hidden text-white" />
                       <Crown size={14} className="hidden sm:block text-white" />
-                    </span>
-                  )}
-                  {user.isSpectator && (
-                    <span className="absolute -bottom-1 -right-1 bg-slate-400 rounded-full p-0.5 sm:p-1 shadow-md">
-                      <MessageSquare size={10} className="sm:hidden text-white" />
-                      <MessageSquare size={14} className="hidden sm:block text-white" />
                     </span>
                   )}
                 </div>
@@ -129,7 +117,7 @@ export function VirtualTable({ users, revealed, shape, average, showChat = false
 
                 {/* Card */}
                 <AnimatePresence>
-                  {user.vote && !user.isSpectator && (
+                  {user.value && (
                     <motion.div
                       initial={{ y: 20, opacity: 0, rotateY: 180 }}
                       animate={{
@@ -149,7 +137,11 @@ export function VirtualTable({ users, revealed, shape, average, showChat = false
                                 scale: 1,
                                 opacity: 1,
                               }}
-                              transition={{ delay: index * 0.1 + 0.2, type: "spring", stiffness: 200 }}
+                              transition={{
+                                delay: index * 0.1 + 0.2,
+                                type: "spring",
+                                stiffness: 200,
+                              }}
                               className="relative"
                             >
                               {/* Pulsing glow effect behind the number */}
@@ -167,14 +159,20 @@ export function VirtualTable({ users, revealed, shape, average, showChat = false
                               />
 
                               {/* Card value with shadow for better readability */}
-                              <div className="relative text-white text-base sm:text-2xl font-bold drop-shadow-md">
-                                {user.vote}
+                              <div className="relative text-white text-base sm:text-lg font-bold drop-shadow-md">
+                                {user.value}
                               </div>
                             </motion.div>
                           )}
                         </div>
                       </div>
-                      <div className="absolute inset-0 backface-hidden" style={{ transform: "rotateY(180deg)" }}>
+                      <div
+                        className={cn(
+                          "absolute inset-0 backface-hidden",
+                          revealed && "hidden"
+                        )}
+                        style={{ transform: "rotateY(180deg)" }}
+                      >
                         <div className="w-full h-full rounded-lg bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
                           <div className="w-5 h-5 sm:w-8 sm:h-8 rounded-full bg-white/50 backdrop-blur-sm"></div>
                         </div>
@@ -184,7 +182,7 @@ export function VirtualTable({ users, revealed, shape, average, showChat = false
                 </AnimatePresence>
               </div>
             </div>
-          )
+          );
         })}
       </div>
 
@@ -195,5 +193,5 @@ export function VirtualTable({ users, revealed, shape, average, showChat = false
         </div>
       )}
     </div>
-  )
+  );
 }

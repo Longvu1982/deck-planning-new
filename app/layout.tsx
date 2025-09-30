@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import { Toaster } from "@/components/ui/sonner";
 import { GeistSans } from "geist/font/sans";
+import type { Metadata } from "next";
 import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 
@@ -29,6 +30,7 @@ export default function RootLayout({
           zIndex={10000}
         />
         {children}
+        <Toaster />
       </body>
     </html>
   );

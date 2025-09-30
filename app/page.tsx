@@ -37,7 +37,7 @@ export default function LandingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                Agile Estimation Made Easy 123
+                Agile Estimation Made Easy
               </motion.h1>
               <motion.p
                 className="mt-6 text-lg text-slate-600 max-w-xl mx-auto lg:mx-0"

@@ -1,22 +1,19 @@
 "use client";
 
-import Link from "next/link";
+import { FeatureCard } from "@/components/feature-card";
+import { LandingFooter } from "@/components/landing-footer";
+import { LandingHeader } from "@/components/landing-header";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
-  Users,
   BarChart3,
-  Clock,
-  Zap,
   CheckCircle2,
+  Clock,
+  Users,
+  Zap,
 } from "lucide-react";
-import { LandingHeader } from "@/components/landing-header";
-import { LandingFooter } from "@/components/landing-footer";
-import { FeatureCard } from "@/components/feature-card";
-import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function LandingPage() {
   return (
@@ -40,7 +37,7 @@ export default function LandingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                Agile Estimation Made Easy
+                Agile Estimation Made Easy 123
               </motion.h1>
               <motion.p
                 className="mt-6 text-lg text-slate-600 max-w-xl mx-auto lg:mx-0"

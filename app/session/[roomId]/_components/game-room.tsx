@@ -72,7 +72,7 @@ export default function SessionPage() {
   const calculateAverage = () => {
     const numericVotes = users
       .map((user) => user.value ?? 0)
-      .filter((vote) => !isNaN(vote));
+      .filter((vote) => vote && !isNaN(vote));
 
     if (numericVotes.length === 0) return null;
 

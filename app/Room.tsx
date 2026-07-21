@@ -1,6 +1,6 @@
 "use client";
 
-import { EState } from "@/liveblocks.config";
+import { ESelectionStatus, EState } from "@/liveblocks.config";
 import { LiveList, LiveObject } from "@liveblocks/client";
 import {
   ClientSideSuspense,
@@ -41,6 +41,7 @@ export function Room({ children }: { children: ReactNode }) {
               name: initialUsername ?? "",
               host: true,
               value: null,
+              status: ESelectionStatus.IDLE,
             }),
           ]),
           roomInfo: new LiveObject({

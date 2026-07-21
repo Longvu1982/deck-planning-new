@@ -5,11 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { VirtualTable } from "@/components/virtual-table";
-import { EState, UserSelection } from "@/liveblocks.config";
+import { ESelectionStatus, EState, UserSelection } from "@/liveblocks.config";
 import { useMutation, useStorage } from "@liveblocks/react/suspense";
 import { Home, Settings, Users } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useLocalStorage from "use-local-storage";
 
 const maxCardValue = 6;
@@ -29,23 +29,43 @@ export default function SessionPage() {
     timerDuration: 30,
   });
 
+  const currentUser = users?.find((u) => u.name === currentUserName);
+
   const currentSelected = users?.find(
-    (item) => item.name === currentUserName
+    (item) => item.name === currentUserName,
   )?.value;
+
+  const [localValue, setLocalValue] = useState(currentSelected ?? 0);
+
+  useEffect(() => {
+    setLocalValue(currentSelected ?? 0);
+  }, [currentSelected]);
 
   const userIndex = users.findIndex((item) => item.name === currentUserName);
 
-  const onSelect = useMutation(
+  const onSliderChange = useMutation(
     ({ storage }, value: number) => {
       if (gameState.state === EState.REVEALED) return;
       const currentUserSelect = storage.get("selections").get(userIndex);
-      currentUserSelect?.set(
-        "value",
-        currentUserSelect?.get("value") === value ? null : value
-      );
+      currentUserSelect?.set("status", value ? ESelectionStatus.SELECTING: ESelectionStatus.IDLE);
     },
-    [gameState, userIndex]
+    [gameState, userIndex],
   );
+
+  const onSubmit = useMutation(
+    ({ storage }, value: number) => {
+      if (gameState.state === EState.REVEALED) return;
+      const currentUserSelect = storage.get("selections").get(userIndex);
+      currentUserSelect?.set("value", value);
+      currentUserSelect?.set("status", ESelectionStatus.DONE);
+    },
+    [gameState, userIndex],
+  );
+
+  const handleSliderChange = (value: number) => {
+    setLocalValue(value);
+    onSliderChange(value);
+  };
 
   const handleReveal = useMutation(({ storage }) => {
     const gameStateStorage = storage.get("gameState");
@@ -57,7 +77,10 @@ export default function SessionPage() {
     gameStateStorage.set("state", EState.PENDING);
 
     const selections = storage.get("selections");
-    selections.forEach((item) => item.set("value", null));
+    selections.forEach((item) => {
+      item.set("value", null);
+      item.set("status", ESelectionStatus.IDLE);
+    });
   }, []);
 
   const toggleSettings = () => {
@@ -167,11 +190,28 @@ export default function SessionPage() {
             max={maxCardValue}
             step={0.5}
             className=""
-            value={[currentSelected ?? 0]}
-            onValueChange={(value) => onSelect(value[0])}
+            value={[localValue]}
+            onValueChange={(value) => handleSliderChange(value[0])}
+            disabled={gameState.state === EState.REVEALED}
           />
 
-          {isHost && (
+          {!currentUser?.host && (
+            <div className="flex gap-3">
+              <Button
+                className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 border-0 hover:opacity-90"
+                size="lg"
+                onClick={() => onSubmit(localValue)}
+                disabled={
+                  gameState.state === EState.REVEALED ||
+                  currentUser?.status !== ESelectionStatus.SELECTING
+                }
+              >
+                SUBMIT
+              </Button>
+            </div>
+          )}
+
+          {currentUser?.host && (
             <div className="flex gap-3">
               <Button
                 className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 border-0 hover:opacity-90"

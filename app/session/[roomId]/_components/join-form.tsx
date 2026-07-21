@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ESelectionStatus } from "@/liveblocks.config";
 import { LiveObject } from "@liveblocks/client";
 import { useMutation } from "@liveblocks/react";
 import { useForm } from "react-hook-form";
@@ -69,6 +70,7 @@ export default function JoinRoomForm({
         name: username,
         host: false,
         value: null,
+        status: ESelectionStatus.IDLE,
       });
 
       selections.push(newSelectUser);

@@ -3,10 +3,17 @@
 import { LiveList, LiveObject } from "@liveblocks/client";
 
 // https://liveblocks.io/docs/api-reference/liveblocks-react#Typing-your-data
+export enum ESelectionStatus {
+  IDLE = "idle",
+  SELECTING = "selecting",
+  DONE = "done",
+}
+
 export type UserSelection = {
   name: string;
   value: number | null;
   host: boolean;
+  status: ESelectionStatus;
 };
 
 export type TRoomInfo = {

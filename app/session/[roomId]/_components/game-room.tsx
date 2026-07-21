@@ -195,7 +195,7 @@ export default function SessionPage() {
             disabled={gameState.state === EState.REVEALED}
           />
 
-          {!currentUser?.host && (
+          {currentUser && (
             <div className="flex gap-3">
               <Button
                 className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 border-0 hover:opacity-90"

@@ -217,7 +217,7 @@ export default function SessionPage() {
                 className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 border-0 hover:opacity-90"
                 size="lg"
                 onClick={handleReveal}
-                disabled={gameState.state === EState.REVEALED}
+                disabled={gameState.state === EState.REVEALED || users.some(user => user.status === ESelectionStatus.SELECTING)}
               >
                 Reveal Cards
               </Button>
